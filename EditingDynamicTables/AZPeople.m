@@ -14,7 +14,8 @@ static NSString* firstNamesArray [] = {@"Alex", @"Kate", @"Steven", @"Patrick", 
 static NSString* lastNamesArray [] = {@"Johnson", @"Paterson", @"Davidson", @"Poulson", @"Garrison", @"Luter", @"Klein", nil};
 static int namesCount = 7;
 
-+ (AZPeople*) randomPeople {
++ (AZPeople*)randomPeople {
+    
     NSString* generatedName = [NSString stringWithFormat:@"%@ %@", firstNamesArray[arc4random() % namesCount], lastNamesArray[arc4random() % namesCount]];
     CGFloat grade = arc4random() % 6 + 5;
     

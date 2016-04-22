@@ -14,6 +14,6 @@
 @property (strong, nonatomic) NSString* name;
 @property (assign, nonatomic) CGFloat grade;
 
-+ (AZPeople*) randomPeople;
++ (AZPeople*)randomPeople;
 
 @end

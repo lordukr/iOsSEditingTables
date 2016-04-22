@@ -31,7 +31,6 @@
     // Dispose of any resources that can be recreated.
 }
 - (void)loadView {
-    
     [super loadView];
     
     CGRect rect = self.view.bounds;
@@ -55,29 +54,7 @@
 
 #pragma mark - Private Methods
 
-- (void) createRandomPeoples {
-    
-    for (int i = 0; i < (arc4random() % 6 + 2); i++) {
-        
-        AZGroup* temp = [[AZGroup alloc] init];
-        temp.groupName = [NSString  stringWithFormat:@"Group # %d", i];
-        
-        NSMutableArray* tempStudents = [[NSMutableArray alloc] init];
-        
-        for (int j = 0; j < (arc4random() % 21 + 10); j++) {
-            AZPeople* tempStudent = [AZPeople randomPeople];
-            
-            [tempStudents addObject:tempStudent];
-        }
-        
-        temp.studentsInGroup = tempStudents;
-        
-        [self.groupsArray addObject:temp];
-        
-    }
-}
-
-- (void) actionAdd:(UIBarButtonItem*) sender {
+- (void)actionAdd:(UIBarButtonItem*) sender {
     
     [self.tableView beginUpdates];
     
@@ -102,7 +79,7 @@
     });
 }
 
-- (void) actionEdit:(UIBarButtonItem*) sender {
+- (void)actionEdit:(UIBarButtonItem*) sender {
     
     BOOL isUpdatingTable = self.tableView.editing;
     
@@ -122,47 +99,30 @@
     
 }
 
-- (AZPeople*) getStudent:(NSIndexPath*) index {
-    AZPeople* currentStudent = [[[self.groupsArray objectAtIndex:index.section] studentsInGroup] objectAtIndex:index.row - 1];
+- (AZPeople*)getStudent:(NSIndexPath*) index {
+    AZGroup* tempGroup = [self.groupsArray objectAtIndex:index.section];
+    AZPeople* currentStudent =  [tempGroup.studentsInGroup objectAtIndex:index.row - 1];
     
     return currentStudent;
-}
-
-- (void) removeSection:(NSIndexPath*) indexPath {
-    
-    [self.tableView beginUpdates];
-    
-    NSIndexSet* index = [NSIndexSet indexSetWithIndex:indexPath.section];
-    
-    [self.groupsArray removeObjectAtIndex:indexPath.section];
-    
-    [self.tableView deleteSections:index withRowAnimation:UITableViewRowAnimationBottom];
-    
-    [self.tableView endUpdates];
-    
-    [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [[UIApplication sharedApplication] endIgnoringInteractionEvents];
-    });
 }
 
 #pragma mark - UITableViewDataSource
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    AZPeople* people = [self getStudent:indexPath];
+    __weak AZPeople* people = [self getStudent:indexPath];
     AZGroup* tempGroup = [self.groupsArray objectAtIndex:indexPath.section];
     
     NSMutableArray* tempArray = [NSMutableArray arrayWithArray:tempGroup.studentsInGroup];
     [tempArray removeObject:people];
+    
     tempGroup.studentsInGroup = tempArray;
     
     [self.tableView beginUpdates];
     
     [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationBottom];
-    [self.tableView endUpdates];
     
+    [self.tableView endUpdates];
     
 }
 
@@ -200,12 +160,12 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
     if (indexPath.row == 0) {
-        static NSString* addIdentifier = @"addPeopleIdentifier";
+        static NSString* addPeopleIdentifier = @"addPeopleIdentifier";
         
-        UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:addIdentifier];
+        UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:addPeopleIdentifier];
         
         if (!cell) {
-            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:addIdentifier];
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:addPeopleIdentifier];
             cell.textLabel.text = @"Tap to add student";
             cell.textLabel.textColor = [UIColor blueColor];
         }
@@ -213,19 +173,18 @@
             
         } else {
     
-    static NSString* identifier = @"peopleIdentifier";
+    static NSString* studentIdentifier = @"studentIdentifier";
     
-    UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+    UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:studentIdentifier];
     
     if (!cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
-        
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:studentIdentifier];
     }
     
     AZPeople* currentPeople = [self getStudent:indexPath];
     
     cell.textLabel.text = currentPeople.name;
-    cell.detailTextLabel.text = [NSString stringWithFormat:@"%1.0f", currentPeople.grade];
+    cell.detailTextLabel.text = [NSString stringWithFormat:@"%d", (int)currentPeople.grade];
     
     return cell;
     }
@@ -246,6 +205,7 @@
     tempGroup.studentsInGroup = temp;
     
     tempGroup = [self.groupsArray objectAtIndex:destinationIndexPath.section];
+    
     temp = [NSMutableArray arrayWithArray:tempGroup.studentsInGroup];
     NSIndexSet* set = [NSIndexSet indexSetWithIndex:destinationIndexPath.row - 1];
     [temp insertObjects:@[people] atIndexes:set];
@@ -259,7 +219,6 @@
 
 //view animations
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-    
     
     if (!tableView.editing) {
         /*
@@ -323,22 +282,6 @@
     }
 }
 
-- (void)tableView:(UITableView *)tableView willDisplayHeaderView:(UIView *)view forSection:(NSInteger)section{
-    
-}
-- (void)tableView:(UITableView *)tableView willDisplayFooterView:(UIView *)view forSection:(NSInteger)section {
-    
-}
-- (void)tableView:(UITableView *)tableView didEndDisplayingCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath*)indexPath {
-    
-}
-- (void)tableView:(UITableView *)tableView didEndDisplayingHeaderView:(UIView *)view forSection:(NSInteger)section {
-    
-}
-- (void)tableView:(UITableView *)tableView didEndDisplayingFooterView:(UIView *)view forSection:(NSInteger)section {
-    
-}
-
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -364,6 +307,7 @@
         [self.tableView beginUpdates];
         
         NSIndexPath* newIndexPath = [NSIndexPath indexPathForItem:newPath + 1 inSection:indexPath.section];
+        
         [self.tableView insertRowsAtIndexPaths:@[newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
         
         [self.tableView endUpdates];
@@ -378,6 +322,7 @@
 }
 
 - (NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath {
+    
     if (proposedDestinationIndexPath.row == 0) {
         return sourceIndexPath;
     } else {
