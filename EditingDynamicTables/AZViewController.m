@@ -217,6 +217,8 @@
 
 #pragma mark - UITableViewDelegate
 
+
+
 //view animations
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
     
@@ -255,7 +257,6 @@
                      }];
     }
     */
-    //
     
     //1. Setup the CATransform3D structure
     CATransform3D rotation;
@@ -311,9 +312,6 @@
         [self.tableView insertRowsAtIndexPaths:@[newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
         
         [self.tableView endUpdates];
-        [self.tableView reloadData];
-        
-        [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [[UIApplication sharedApplication] endIgnoringInteractionEvents];
