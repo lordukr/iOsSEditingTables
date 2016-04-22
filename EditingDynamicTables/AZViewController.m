@@ -311,6 +311,7 @@
         [self.tableView insertRowsAtIndexPaths:@[newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
         
         [self.tableView endUpdates];
+        [self.tableView reloadData];
         
         [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
         
